@@ -1,79 +1,139 @@
-//#region task 07 part
 
 
-//array that holds all my employee
-allEmployees = [];
 
-function Employee(id, name, department, level, image){
 
-  this.employeeID = id;
-  this.employeeName = name;
-  this.employeeDepartment = department;
-  this.employeeLevel = level;
-  this.employeeImage = image;
-  this.employeeSalary;
-  
-  allEmployees.push(this);
+
+
+'use-strict';
+
+var employees = [];
+
+function Employee(empID, fullName, department, level, image) {
+        this.empID = empID,
+        this.fullName = fullName,
+        this.department = department,
+        this.level = level,
+        this.image = image,
+        this.salary = 0
+}
+
+Employee.prototype.calculateNetSalary = function () {
+
+    let salary;
+
+    if (this.level == "Senior") {
+        salary = getRandomNumberBetween(1500, 2000);
+    }
+    else if (this.level == "Junior") {
+        salary = getRandomNumberBetween(500, 1000);
+    }
+    else {
+        salary = getRandomNumberBetween(1000, 1500);
+    }
+
+    this.salary = salary;
+    this.netSalary = salary - (salary * (7.5 / 100));
+}
+
+Employee.prototype.render = function () {
+
+    // get this members container
+    let members = document.getElementById('members-container');
+
+    // create a card for the employee
+    let card = document.createElement("div");
+    card.classList.add("team-member");
+
+    // create profile-pic for the employee
+    let imgElement = document.createElement("img");
+    imgElement.classList.add("profile-pic");
+    imgElement.setAttribute("src", this.image);
+
+    card.appendChild(imgElement);
+
+    // create employee's info container
+    let empInfo = document.createElement("div");
+    empInfo.classList.add("info");
+
+    // create info elements
+    let id = document.createElement("p");
+    let name = document.createElement("p");
+    let department = document.createElement("p");
+    let level = document.createElement("p");
+    let salary = document.createElement("p");
+
+    id.innerHTML = "ID: " + this.empID;
+    name.innerHTML = "Name: " + this.fullName;
+    department.innerHTML = "Department: " + this.department;
+    level.innerHTML = "Level: " + this.level;
+    salary.innerHTML = "Salary: " + this.salary;
+
+    empInfo.appendChild(id);
+    empInfo.appendChild(name);
+    empInfo.appendChild(department);
+    empInfo.appendChild(level);
+    empInfo.appendChild(salary);
+
+    card.appendChild(empInfo);
+
+    members.appendChild(card);
 }
 
 
-//My prototype to generate salary data
-Employee.prototype.employeeSalary = function(){
+document.getElementById('submit-btn').addEventListener("click", function () {
 
-  if (this.employeeLevel == "Junior") {
+    let full_name = document.getElementById('name');
+    let department = document.getElementById('department');
+    let level = document.getElementById('level');
+    let image = document.getElementById('image');
 
-    this.employeeSalary = getRandomNumberBetween(500,1000);
-    return (this.employeeSalary - 0.075 * this.employeeSalary);
-    //return getRandomNumberBetween(500,1000);
-  }
-  if (this.employeeLevel == "Mid-Senior") {
-    this.employeeSalary = getRandomNumberBetween(1000,1500);
-    return (this.employeeSalary - 0.075 * this.employeeSalary);
-    //return getRandomNumberBetween(1000,1500);    
-  }
-  if (this.employeeLevel == "Senior") {
-    this.employeeSalary = getRandomNumberBetween(1500,2000);
-    return (this.employeeSalary - 0.075 * this.employeeSalary);
-    //return getRandomNumberBetween(1500,2000);    
-  }
+    if(full_name.value == ""){
+        alert("Name is required!");
+        return;
+    }
 
+    let empId = getUniqueRandomID();
+
+    let newEmp = new Employee(empId, full_name.value, department.value,level.value,image.value );
+    newEmp.calculateNetSalary();
+
+    newEmp.render();
+
+    employees.push(newEmp);
+});
+
+function getRandomNumberBetween(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-//loop to give salaries to all employees
-for (let i = 0; i < allEmployees.length; i++) {
-  allEmployees[i].employeeSalary();
+function getUniqueRandomID() {
+
+    let id = getRandomNumberBetween(1000, 9999);
+
+    for (let i = 0; i < employees.length; i++) {
+        if (employees[i].empID == id) {
+            id = getRandomNumberBetween(1000, 9999);
+            i = 0;
+        }
+    }
+
+    return id;
 }
 
-
-//prototype function to render employee
-Employee.prototype.renderEmployee = function(){
-
-  let renderEmployeeOutput = ("<b><u>Name:</u></b> " + this.employeeName + ". " + "&nbsp;&nbsp;" + " <b><u>Salary:</u></b> " + this.employeeSalary()  + "." + "<br><br>" )
-
-  document.write(renderEmployeeOutput);
-
+// render some emps
+function addEmployee(emp){
+    emp.calculateNetSalary();
+    emp.render();
+    employees.push(emp);
 }
 
-//function to return a random number
-function getRandomNumberBetween(min,max){
-  return Math.floor(Math.random()*(max-min+1)+min);
-}
-
-//Creating my employees from table data
-let emp01 = new Employee(1000, "Ghazi Samer", "Administration", "Senior", "randomURL");
-let emp02 = new Employee(1001, "Lana Ali", "Finance", "Senior", "randomURL");
-let emp03 = new Employee(1002, "Tamara Ayoub", "Marketing", "Senior", "randomURL");
-let emp04 = new Employee(1003, "Safi Walid", "Administration", "Mid-Senior", "randomURL");
-let emp05 = new Employee(1004, "Omar Zaid", "Development", "Senior", "randomURL");
-let emp06 = new Employee(1005, "Rana Saleh", "Development", "Junior", "randomURL");
-let emp07 = new Employee(1006, "Hadi Ahmad", "Finance", "Mid-Senior", "randomURL");
-
-
-//loop to render all employees
-for (let i = 0; i < allEmployees.length; i++) {
-  allEmployees[i].renderEmployee();
-}
-
+addEmployee(new Employee(getUniqueRandomID(), "Ghazi samer", "Administration","Senior", "pic/emp1.jpg"));
+addEmployee(new Employee(getUniqueRandomID(), "lana ali", "finance","Senior", "pic/em2.png"));
+addEmployee(new Employee(getUniqueRandomID(), "Omar Zaid", "Development","Senior", "pic/emp5.jpg"));
+addEmployee(new Employee(getUniqueRandomID(), "Safi Walid", "Administration","mid-senior", "pic/emp4.png"));
+addEmployee(new Employee(getUniqueRandomID(), "Hadi Ahmad", "Finance","Mid-Senior", "pic/emp6.png"));
+addEmployee(new Employee(getUniqueRandomID(), "Rana Saleh", "Development","Junior", "pic/emp7.jpg"));
+addEmployee(new Employee(getUniqueRandomID(), "tamara ayoup", "marketing","Senior", "pic/em3.jpg"));
 
 
 
